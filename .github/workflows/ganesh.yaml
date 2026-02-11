@@ -18,16 +18,16 @@ jobs:
           npm install
           npm run build
 
-      - name: Copy build files to EC2
+      - name: Copy build folder to EC2 temp
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_KEY }}
-          source: "build/*"
-          target: "/home/ec2-user/food-app-build"
+          source: "build"
+          target: "/tmp/food-app"
 
-      - name: Run React build on EC2 using serve
+      - name: Deploy build into /root/food/food-app and run serve
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.EC2_HOST }}
@@ -37,16 +37,23 @@ jobs:
             echo "==== Installing serve package ===="
             sudo npm install -g serve
 
+            echo "==== Creating target directory ===="
+            sudo mkdir -p /root/food/food-app
+
+            echo "==== Copying build folder into /root/food/food-app ===="
+            sudo rm -rf /root/food/food-app/build
+            sudo cp -r /tmp/food-app/build /root/food/food-app/
+
             echo "==== Killing old app running on 8080 (if any) ===="
             sudo fuser -k 8080/tcp || true
 
             echo "==== Starting app on port 8080 ===="
-            nohup serve -s /home/ec2-user/food-app-build/build -l 8080 > app.log 2>&1 &
+            nohup sudo serve -s /root/food/food-app/build -l 8080 > /root/food/food-app/app.log 2>&1 &
 
             echo "==== Checking if port 8080 is listening ===="
             sudo netstat -tulnp | grep 8080 || true
 
-            echo "==== Checking HTTP response from localhost ===="
+            echo "==== Checking HTTP response ===="
             curl -I http://localhost:8080 || true
 
             echo "==== Deployment Completed ===="
