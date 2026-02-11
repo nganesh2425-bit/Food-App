@@ -3,6 +3,7 @@ name: Deploy React App to EC2 (Without Nginx)
 on:
   push:
     branches:
+      - main
       - master
 
 jobs:
@@ -27,33 +28,37 @@ jobs:
           source: "build"
           target: "/tmp/food-app"
 
-      - name: Deploy build into /root/food/food-app and run serve
+      - name: Deploy build and start app
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_KEY }}
           script: |
-            echo "==== Installing serve package ===="
-            sudo npm install -g serve
-
-            echo "==== Creating target directory ===="
+            echo "==== Copy build folder ===="
             sudo mkdir -p /root/food/food-app
-
-            echo "==== Copying build folder into /root/food/food-app ===="
             sudo rm -rf /root/food/food-app/build
             sudo cp -r /tmp/food-app/build /root/food/food-app/
 
-            echo "==== Killing old app running on 8080 (if any) ===="
-            sudo fuser -k 8080/tcp || true
+            echo "==== Install serve and pm2 ===="
+            sudo npm install -g serve pm2
 
-            echo "==== Starting app on port 8080 ===="
-            nohup sudo serve -s /root/food/food-app/build -l 8080 > /root/food/food-app/app.log 2>&1 &
+            echo "==== Stop old app if running ===="
+            sudo pm2 delete food-app || true
+
+            echo "==== Start app using pm2 on port 8080 ===="
+            sudo pm2 start "serve -s /root/food/food-app/build -l 8080" --name food-app
+
+            echo "==== Save pm2 process ===="
+            sudo pm2 save
 
             echo "==== Checking if port 8080 is listening ===="
-            sudo netstat -tulnp | grep 8080 || true
+            sudo ss -tulnp | grep 8080 || true
 
             echo "==== Checking HTTP response ===="
             curl -I http://localhost:8080 || true
+
+            echo "==== PM2 Status ===="
+            sudo pm2 list
 
             echo "==== Deployment Completed ===="
