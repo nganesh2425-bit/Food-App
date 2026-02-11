@@ -27,13 +27,4 @@ jobs:
           source: "build/*"
           target: "/tmp/react-build"
 
-      - name: Deploy in Nginx folder
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USER }}
-          key: ${{ secrets.EC2_KEY }}
-          script: |
-            sudo rm -rf /var/www/html/*
-            sudo cp -r /tmp/react-build/build/* /var/www/html/
-            sudo systemctl restart nginx
+
