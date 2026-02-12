@@ -13,25 +13,7 @@ const foodItems = [
   { id: 9, name: "Veg Shawarma", price: 130 },
   { id: 10, name: "Chicken Fried Rice", price: 170 },
   { id: 11, name: "Veg Fried Rice", price: 140 },
-  { id: 12, name: "Chicken Noodles", price: 160 },
-  { id: 13, name: "Veg Noodles", price: 130 },
-  { id: 14, name: "Momos (Veg)", price: 90 },
-  { id: 15, name: "Momos (Chicken)", price: 120 },
-  { id: 16, name: "Butter Chicken", price: 260 },
-  { id: 17, name: "Paneer Butter Masala", price: 220 },
-  { id: 18, name: "Tandoori Chicken", price: 280 },
-  { id: 19, name: "Masala Dosa", price: 80 },
-  { id: 20, name: "Idli Sambar", price: 60 },
-  { id: 21, name: "Chicken Curry", price: 200 },
-  { id: 22, name: "Veg Thali", price: 150 },
-  { id: 23, name: "Chicken Thali", price: 190 },
-  { id: 24, name: "Ice Cream", price: 70 },
-  { id: 25, name: "Gulab Jamun", price: 60 },
-  { id: 26, name: "Coke", price: 40 },
-  { id: 27, name: "Sprite", price: 40 },
-  { id: 28, name: "Water Bottle", price: 20 },
-  { id: 29, name: "Tea", price: 15 },
-  { id: 30, name: "Coffee", price: 25 },
+  
 ];
 
 function App() {
@@ -45,7 +27,7 @@ function App() {
 
   return (
     <div className="container">
-      <h1>🍔 Food Delivery App</h1>
+      <h1> Food Delivery App</h1>
 
       <h2>Menu</h2>
       <div className="menu">
